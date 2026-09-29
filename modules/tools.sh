@@ -2,13 +2,11 @@
 
 set_shortcut() {
     clear
-    # 获取主脚本 fanta1.sh 的绝对路径，确保快捷命令启动的是主入口
     local main_script="$HOME/fanta/fanta1.sh"
     chmod +x "$main_script"
     
     echo -e "${GREEN}===== 设置系统级快捷命令 =====${NC}"
-    echo -e "${YELLOW}提示：快捷命令仅支持英文字母、数字、下划线和连字符${NC}"
-    echo -e "${YELLOW}⚠️ 严禁使用特殊字符（如斜杠,/、空格等），否则无法在 Linux 中生效！${NC}"
+    echo -e "${YELLOW}提示：快捷命令仅支持英文字母, 数字, 下划线和连字符${NC}"
     read -p "-> 请输入您想要的快捷命令名称: " custom_cmd
     
     if [ -z "$custom_cmd" ]; then
@@ -16,14 +14,12 @@ set_shortcut() {
         echo -e "${YELLOW}[提示] 未输入有效名称，已自动为您设置为默认快捷键: f${NC}"
     else
         if [[ ! "$custom_cmd" =~ ^[a-zA-Z0-9_-]+$ ]]; then
-            echo -e "\n${RED}[错误] 输入包含 Linux 不支持的特殊字符！${NC}"
-            echo -e "${RED}[错误] 快捷命令创建失败，请重新选择字母或数字组合。${NC}"
+            echo -e "\n${RED}[错误] 输入包含不支持的特殊字符！${NC}"
             handle_exit_options
             return
         fi
     fi
     
-    # 清理旧的软链接
     for file in /usr/local/bin/*; do
         if [ -L "$file" ] && [[ "$(readlink -f "$file")" == *"fanta"* ]]; then
             rm -f "$file"
@@ -32,9 +28,9 @@ set_shortcut() {
     
     if ln -sf "$main_script" "/usr/local/bin/$custom_cmd"; then
         echo -e "\n${GREEN}[成功] 快捷命令设置成功！已即时生效。${NC}"
-        echo -e "${YELLOW}以后只需在任意终端直接输入 ${GREEN}$custom_cmd${YELLOW} 即可随时启动主脚本！${NC}"
+        echo -e "${YELLOW}以后在服务器【任何地方】直接输入 ${GREEN}$custom_cmd${YELLOW} 即可启动！${NC}"
     else
-        echo -e "\n${RED}[错误] 软链接创建失败，请检查系统权限！${NC}"
+        echo -e "\n${RED}[错误] 软链接创建失败，请检查权限！${NC}"
     fi
     
     handle_exit_options
@@ -43,24 +39,23 @@ set_shortcut() {
 update_script() {
     clear
     echo -e "${GREEN}===== 智能更新与自修复系统 =====${NC}"
-    local project_dir=~/fanta
+    local project_dir="$HOME/fanta"
     
     if [ ! -d "$project_dir/.git" ]; then
-        echo -e "${RED}[错误] 未检测到 Git 仓库环境！${NC}"
+        echo -e "${RED}[错误] 未在 $project_dir 检测到 Git 仓库环境！${NC}"
         handle_exit_options
         return
-    }
+    fi
 
-    cd "$project_dir" || return
+    cd "$project_dir" || { echo -e "${RED}[错误] 无法切换到项目目录！${NC}"; handle_exit_options; return; }
     
-    echo -e "${YELLOW}1. 正在从 GitHub 强制拉取最新代码（无缓存）...${NC}"
+    echo -e "${YELLOW}1. 正在从 GitHub 强制拉取最新代码（无缓存、全目录同步）...${NC}"
     git fetch origin main
     git reset --hard origin/main
     
     if [ $? -eq 0 ]; then
         echo -e "${YELLOW}2. 正在自动修复主程序及所有子模块的执行权限...${NC}"
-        chmod +x fanta1.sh tool.sh modules/*.sh 2>/dev/null
-        
+        chmod +x fanta1.sh modules/*.sh 2>/dev/null
         echo -e "\n${GREEN}[成功] 工具箱及所有模块已完美更新并修复权限！${NC}"
     else
         echo -e "\n${RED}[错误] 更新失败，请检查网络连接或远程仓库状态。${NC}"
