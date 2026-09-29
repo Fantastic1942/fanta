@@ -89,7 +89,7 @@ vps_ecosystem_menu() {
         echo "5. 甬哥 Sing-box 精装桶五合一脚本"
         echo "6. Kejilion Linux 综合运维与节点工具箱"
         echo "7. fscarmen WARP 一键配置脚本"
-        echo "8. Misaka-blog Xray/Reality 快捷搭建脚本"
+        echo "8. Litebox 轻量 Sing-box 节点脚本"
         echo "9. fscarmen sing-box 一键脚本"
         echo -e "${YELLOW}--- 玩家推荐与导航 ---${NC}"
         echo "10. 常用 VPS 商家导航"
@@ -151,8 +151,8 @@ vps_ecosystem_menu() {
                 ;;
             8)
                 clear
-                echo -e "${GREEN}===== 正在运行 Misaka-blog 节点脚本 =====${NC}"
-                bash <(curl -sL https://raw.githubusercontent.com/Misaka-blog/xray-script/main/xray.sh)
+                echo -e "${GREEN}===== 正在运行 Litebox 轻量 Sing-box 节点脚本 =====${NC}"
+                bash <(curl -fsSL https://raw.githubusercontent.com/linlvyy/litebox-singbox-mini/main/install.sh)
                 handle_exit_options
                 ;;
             9)
