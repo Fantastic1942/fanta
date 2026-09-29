@@ -2,8 +2,9 @@
 
 set_shortcut() {
     clear
-    local script_path=$(readlink -f "$0")
-    chmod +x "$script_path"
+    # 获取主脚本 fanta1.sh 的绝对路径，确保快捷命令启动的是主入口
+    local main_script="$HOME/fanta/fanta1.sh"
+    chmod +x "$main_script"
     
     echo -e "${GREEN}===== 设置系统级快捷命令 =====${NC}"
     echo -e "${YELLOW}提示：快捷命令仅支持英文字母、数字、下划线和连字符${NC}"
@@ -22,15 +23,16 @@ set_shortcut() {
         fi
     fi
     
+    # 清理旧的软链接
     for file in /usr/local/bin/*; do
-        if [ -L "$file" ] && [ "$(readlink -f "$file")" = "$script_path" ]; then
+        if [ -L "$file" ] && [[ "$(readlink -f "$file")" == *"fanta"* ]]; then
             rm -f "$file"
         fi
     done
     
-    if ln -sf "$script_path" "/usr/local/bin/$custom_cmd"; then
+    if ln -sf "$main_script" "/usr/local/bin/$custom_cmd"; then
         echo -e "\n${GREEN}[成功] 快捷命令设置成功！已即时生效。${NC}"
-        echo -e "${YELLOW}以后只需在任意终端直接输入 ${GREEN}$custom_cmd${YELLOW} 即可随时启动脚本！${NC}"
+        echo -e "${YELLOW}以后只需在任意终端直接输入 ${GREEN}$custom_cmd${YELLOW} 即可随时启动主脚本！${NC}"
     else
         echo -e "\n${RED}[错误] 软链接创建失败，请检查系统权限！${NC}"
     fi
@@ -51,17 +53,17 @@ update_script() {
 
     cd "$project_dir" || return
     
-    echo -e "${YELLOW}1. 正在从 GitHub 安全拉取最新代码...${NC}"
+    echo -e "${YELLOW}1. 正在从 GitHub 强制拉取最新代码（无缓存）...${NC}"
     git fetch origin main
     git reset --hard origin/main
     
     if [ $? -eq 0 ]; then
         echo -e "${YELLOW}2. 正在自动修复主程序及所有子模块的执行权限...${NC}"
-        chmod +x fanta1.sh modules/*.sh 2>/dev/null
+        chmod +x fanta1.sh tool.sh modules/*.sh 2>/dev/null
         
         echo -e "\n${GREEN}[成功] 工具箱及所有模块已完美更新并修复权限！${NC}"
     else
-        echo -e "\n${RED}[错误] 更新失败，请检查网络连接。${NC}"
+        echo -e "\n${RED}[错误] 更新失败，请检查网络连接或远程仓库状态。${NC}"
     fi
     
     echo -e "${YELLOW}提示：建议重新启动工具箱以加载全新逻辑。${NC}"
