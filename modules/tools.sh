@@ -40,30 +40,31 @@ set_shortcut() {
 
 update_script() {
     clear
-    echo -e "${GREEN}===== 更新工具箱（全模块同步） =====${NC}"
-    
-    # 获取项目根目录（假设项目在 ~/fanta）
+    echo -e "${GREEN}===== 智能更新与自修复系统 =====${NC}"
     local project_dir=~/fanta
+    
     if [ ! -d "$project_dir/.git" ]; then
-        echo -e "${RED}[错误] 未检测到 Git 仓库，请通过 install.sh 重新安装！${NC}"
+        echo -e "${RED}[错误] 未检测到 Git 仓库环境！${NC}"
         handle_exit_options
         return
     }
 
-    cd "$project_dir"
+    cd "$project_dir" || return
     
-    echo -e "${YELLOW}正在从 GitHub 拉取最新代码与模块...${NC}"
-    git pull origin main
-
+    echo -e "${YELLOW}1. 正在从 GitHub 安全拉取最新代码...${NC}"
+    git fetch origin main
+    git reset --hard origin/main
+    
     if [ $? -eq 0 ]; then
-        # 确保主脚本拥有执行权限
-        chmod +x fanta1.sh
-        echo -e "\n${GREEN}[成功] Fanta 工具箱及所有模块已成功更新至最新版本！${NC}"
+        echo -e "${YELLOW}2. 正在自动修复主程序及所有子模块的执行权限...${NC}"
+        chmod +x fanta1.sh modules/*.sh 2>/dev/null
+        
+        echo -e "\n${GREEN}[成功] 工具箱及所有模块已完美更新并修复权限！${NC}"
     else
-        echo -e "\n${RED}[错误] 更新失败，可能存在本地代码冲突，请检查 Git 状态。${NC}"
+        echo -e "\n${RED}[错误] 更新失败，请检查网络连接。${NC}"
     fi
     
-    echo -e "${YELLOW}提示：建议重新启动脚本以应用最新代码。${NC}"
+    echo -e "${YELLOW}提示：建议重新启动工具箱以加载全新逻辑。${NC}"
     handle_exit_options
 }
 
